@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Noticias Académico - Universidad & Science News</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        academic: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#1e3a8a',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        tealAccent: {
+                            500: '#0d9488',
+                            600: '#0f766e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .article-body { font-family: 'Merriweather', serif; }
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col transition-colors duration-200">
+
+    <!-- TOP HEADER / INSTITUTIONAL BAR -->
+    <header class="bg-slate-900 text-slate-200 border-b border-slate-800 text-xs py-2 px-4 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <span class="font-semibold tracking-wider text-teal-400 uppercase flex items-center gap-1.5 text-[11px] sm:text-xs">
+                    <i class="fa-solid fa-graduation-cap"></i> <span class="hidden xs:inline">Portal Académico</span><span class="xs:hidden">Gaceta</span>
+                </span>
+                <span class="hidden md:inline text-slate-600">|</span>
+                <span class="hidden md:inline text-slate-300" id="live-datetime"><i class="fa-regular fa-clock mr-1"></i> Cargando fecha...</span>
+            </div>
+
+            <!-- Desktop Actions -->
+            <div class="hidden sm:flex items-center gap-4">
+                <button id="theme-toggle" class="hover:text-teal-400 transition-colors flex items-center gap-1 focus:outline-none" title="Cambiar Tema">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </button>
+                <span class="text-slate-600">|</span>
+                <a href="#boletin" class="hover:text-teal-400 transition-colors flex items-center gap-1">
+                    <i class="fa-regular fa-envelope"></i> Boletín
+                </a>
+                <button onclick="toggleSavedArticles()" class="hover:text-teal-400 transition-colors flex items-center gap-1 relative">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <span>Guardados</span>
+                    <span id="saved-count" class="bg-teal-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
+                </button>
+            </div>
+
+            <!-- Mobile Hamburger Toggle -->
+            <div class="flex sm:hidden items-center gap-2">
+                <button onclick="toggleSavedArticles()" class="p-1.5 text-slate-300 hover:text-teal-400 relative">
+                    <i class="fa-regular fa-bookmark text-base"></i>
+                    <span id="saved-count-mobile" class="absolute -top-1 -right-1 bg-teal-500 text-slate-950 font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-1.5 text-slate-300 hover:text-teal-400 focus:outline-none" aria-label="Abrir Menú">
+                    <i class="fa-solid fa-bars text-lg" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-dropdown" class="hidden sm:hidden pt-3 pb-2 border-t border-slate-800 mt-2 space-y-2">
+            <div class="text-slate-400 text-[11px] pb-1" id="live-datetime-mobile"></div>
+            <div class="flex justify-between items-center py-1 border-b border-slate-800">
+                <span class="text-slate-300 text-xs">Apariencia</span>
+                <button id="theme-toggle-mobile" class="text-xs bg-slate-800 px-3 py-1 rounded text-teal-400 flex items-center gap-1">
+                    <i id="theme-icon-mobile" class="fa-solid fa-moon"></i>
+                    <span id="theme-text-mobile">Modo Oscuro</span>
+                </button>
+            </div>
+            <a href="#boletin" onclick="toggleMobileMenu()" class="block py-1 text-slate-300 hover:text-teal-400 text-xs flex items-center gap-2">
+                <i class="fa-regular fa-envelope"></i> Suscribirse al Boletín
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN BRAND & NAVIGATION -->
+    <section class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-900 dark:bg-blue-700 text-white p-2.5 sm:p-3 rounded-xl shadow-md flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-microscope text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                        GACETA ACADÉMICA
+                        <span class="text-[10px] sm:text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300 px-2 py-0.5 rounded font-mono font-medium">I+D+i</span>
+                    </h1>
+                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Divulgación científica, investigaciones y vida universitaria</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80">
+                <input type="text" id="search-input" placeholder="Buscar título, autor o tema..." 
+                    class="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs sm:text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs (Horizontally Scrollable on Mobile) -->
+        <nav class="max-w-7xl mx-auto px-4 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-slate-700/50">
+            <ul class="flex space-x-1 sm:space-x-2 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 whitespace-nowrap" id="nav-tabs">
+                <li><button onclick="setCategory('Todas')" class="nav-btn active-nav px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Todas</button></li>
+                <li><button onclick="setCategory('Investigación')" class="nav-btn px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Investigación</button></li>
+                <li><button onclick="setCategory('Tecnología e IA')" class="nav-btn px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Tecnología e IA</button></li>
+                <li><button onclick="setCategory('Vida Universitaria')" class="nav-btn px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Vida Universitaria</button></li>
+                <li><button onclick="setCategory('Becas y Convocatorias')" class="nav-btn px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Becas y Convocatorias</button></li>
+                <li><button onclick="setCategory('Eventos')" class="nav-btn px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Eventos</button></li>
+            </ul>
+        </nav>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:py-8 flex-grow w-full">
+
+        <!-- FEATURED HERO NEWS (RESPONSIVE STACK/GRID) -->
+        <section id="hero-section" class="mb-8 sm:mb-10">
+            <!-- Hero Card Rendered via JS -->
+        </section>
+
+        <!-- MAIN LAYOUT: NEWS GRID + SIDEBAR -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- NEWS FEED SECTION (2 COLS ON DESKTOP) -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Section Header -->
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-newspaper text-blue-600 dark:text-blue-400"></i>
+                        <span id="section-title">Noticias Recientes</span>
+                    </h2>
+                    <span id="results-count" class="text-[11px] sm:text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium px-2.5 py-1 rounded-full">Mostrando 6 artículos</span>
+                </div>
+
+                <!-- Articles Grid -->
+                <div id="articles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- Cards injected via JavaScript -->
+                </div>
+
+                <!-- Empty State Message -->
+                <div id="no-results" class="hidden text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                    <i class="fa-solid fa-folder-open text-4xl text-slate-400 mb-3"></i>
+                    <p class="text-base font-semibold text-slate-700 dark:text-slate-200">No se encontraron artículos</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Prueba con otra palabra clave o selecciona otra categoría.</p>
+                    <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition">Ver todas las noticias</button>
+                </div>
+            </div>
+
+            <!-- SIDEBAR WIDGETS (STACKED ON MOBILE) -->
+            <aside class="space-y-6">
+
+                <!-- ACADEMIC CALENDAR WIDGET (COLLAPSIBLE ON MOBILE) -->
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-700">
+                        <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-xs sm:text-sm uppercase tracking-wider">
+                            <i class="fa-regular fa-calendar-days text-teal-600 dark:text-teal-400"></i>
+                            Agenda Académica
+                        </h3>
+                        <button onclick="toggleCalendarWidget()" class="sm:hidden text-slate-400 text-xs">
+                            <i class="fa-solid fa-chevron-down" id="cal-toggle-icon"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3" id="calendar-events">
+                        <!-- Events loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- FAST STATS / IMPACT BANNER -->
+                <div class="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-5 rounded-2xl shadow-md border border-slate-800">
+                    <span class="text-[10px] sm:text-xs text-teal-400 font-semibold uppercase tracking-wider">Indicadores de Investigación</span>
+                    <h4 class="text-base sm:text-lg font-bold mt-1 mb-4">Impacto Científico Institucional</h4>
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
+                            <div class="text-xl sm:text-2xl font-extrabold text-teal-300">142+</div>
+                            <div class="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Papers Publicados</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
+                            <div class="text-xl sm:text-2xl font-extrabold text-blue-300">$3.8M</div>
+                            <div class="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Fondos I+D 2026</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALL FOR PAPERS & GRANTS WIDGET -->
+                <div class="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-award text-amber-500"></i> Convocatorias Abiertas
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800/40">
+                            <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase">Beca Posdoctoral</span>
+                            <h5 class="font-bold text-slate-900 dark:text-slate-100 mt-1">Programa de Biotecnología Aplicada</h5>
+                            <p class="text-slate-600 dark:text-slate-300 mt-1 text-[11px]">Financiamiento completo para proyectos de investigación biomédica de 24 meses.</p>
+                            <div class="mt-2 flex justify-between items-center text-[10px] text-amber-800 dark:text-amber-300 font-medium">
+                                <span>Cierre: 15 Nov 2026</span>
+                                <a href="#" onclick="alert('Redirigiendo al formulario institucional de postulación...')" class="underline hover:text-amber-900">Aplicar &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEWSLETTER SUBSCRIPTION -->
+                <div id="boletin" class="bg-slate-100 dark:bg-slate-800/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-paper-plane text-blue-600 dark:text-blue-400"></i> Boletín Académico
+                    </h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 mb-3">
+                        Recibe el resumen semanal con investigaciones destacadas y convocatorias.
+                    </p>
+                    <form id="newsletter-form" class="space-y-2">
+                        <input type="email" id="newsletter-email" required placeholder="tu.correo@universidad.edu"
+                            class="w-full px-3 py-2 text-xs bg-white dark:bg-slate-700 text-slate-800 dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition shadow-sm">
+                            Suscribirme Ahora
+                        </button>
+                    </form>
+                    <div id="newsletter-msg" class="hidden mt-2 p-2 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 text-xs rounded text-center">
+                        <i class="fa-solid fa-circle-check mr-1"></i> ¡Suscripción confirmada con éxito!
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </main>
+
+    <!-- READER MODAL (FULL ARTICLE DETAIL) -->
+    <div id="reader-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform scale-95 transition-transform duration-200" id="modal-container">
+            
+            <!-- Modal Header Toolbar -->
+            <div class="px-6 py-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <div class="flex items-center gap-2">
+                    <span id="modal-type-badge" class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        Paper Scientific
+                    </span>
+                    <span id="modal-read-time" class="text-xs text-slate-500 dark:text-slate-400">
+                        <i class="fa-regular fa-clock mr-1"></i> 5 min
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="modal-bookmark-btn" onclick="toggleBookmarkCurrent()" class="text-slate-500 hover:text-amber-500 dark:text-slate-400 transition text-sm flex items-center gap-1" title="Guardar Artículo">
+                        <i class="fa-regular fa-bookmark text-lg" id="modal-bookmark-icon"></i>
+                    </button>
+                    <button onclick="downloadPDFMock()" class="text-slate-500 hover:text-blue-600 dark:text-slate-400 transition text-sm flex items-center gap-1" title="Descargar PDF">
+                        <i class="fa-solid fa-file-pdf text-lg"></i>
+                        <span class="hidden sm:inline text-xs">PDF</span>
+                    </button>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-white transition ml-2">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content Area (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-5 flex-grow text-slate-800 dark:text-slate-200">
+                <!-- Title & Meta -->
+                <div>
+                    <span id="modal-category" class="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-widest">CATEGORÍA</span>
+                    <h2 id="modal-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight mt-1">Título del Artículo Académico</h2>
+                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <span class="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300" id="modal-author">
+                            <i class="fa-solid fa-user-gear text-slate-400"></i> Dra. Elena Rostova
+                        </span>
+                        <span id="modal-date"><i class="fa-regular fa-calendar mr-1"></i> 2 Noviembre 2026</span>
+                        <span id="modal-doi" class="font-mono text-[11px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">DOI: 10.1038/s41586-026-0811</span>
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                <div class="rounded-xl overflow-hidden max-h-72 bg-slate-100 dark:bg-slate-800">
+                    <img id="modal-image" src="" alt="Artículo" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Article Full Text -->
+                <div id="modal-body" class="article-body leading-relaxed text-sm sm:text-base space-y-4 text-slate-700 dark:text-slate-300">
+                    <!-- Paragraphs inserted dynamically -->
+                </div>
+
+                <!-- Academic Citation / Reference Section -->
+                <div class="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-quote-right text-blue-500"></i> Cómo citar este artículo (APA 7ª ed.)
+                    </h4>
+                    <p id="modal-citation" class="font-mono text-xs text-slate-600 dark:text-slate-400 leading-normal select-all bg-white dark:bg-slate-900 p-2.5 rounded border border-slate-200 dark:border-slate-700">
+                        Rostova, E., & Martínez, L. (2026). Avances en Computación Cuántica Aplicada. *Revista de Ciencia y Tecnología*, 42(3), 112-128.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center text-xs">
+                <span class="text-slate-500">Portal de Noticias Académico © 2026</span>
+                <button onclick="closeModal()" class="px-4 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition">
+                    Cerrar Lectura
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVED ARTICLES MODAL -->
+    <div id="saved-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-amber-500"></i> Mis Artículos Guardados
+                </h3>
+                <button onclick="toggleSavedArticles()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="saved-articles-list" class="overflow-y-auto my-4 space-y-3 flex-grow">
+                <!-- Dynamic List -->
+            </div>
+            <button onclick="toggleSavedArticles()" class="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 mt-12 py-10">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-white font-bold text-base">
+                    <i class="fa-solid fa-graduation-cap text-teal-400"></i> GACETA ACADÉMICA
+                </div>
+                <p class="leading-relaxed">Órgano oficial de comunicación científica, investigación avanzada y divulgación del ecosistema universitario.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3 uppercase tracking-wider">Secciones</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="setCategory('Investigación')" class="hover:text-teal-400 transition">Investigación & Ciencia</a></li>
+                    <li><a href="#" onclick="setCategory('Tecnología e IA')" class="hover:text-teal-400 transition">Inteligencia Artificial</a></li>
+                    <li><a href="#" onclick="setCategory('Vida Universitaria')" class="hover:text-teal-400 transition">Vida Universitaria</a></li>
+                    <li><a href="#" onclick="setCategory('Becas y Convocatorias')" class="hover:text-teal-400 transition">Becas de Posgrado</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3 uppercase tracking-wider">Recursos</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-teal-400 transition">Repositorio Institucional (OAI-PMH)</a></li>
+                    <li><a href="#" class="hover:text-teal-400 transition">Revistas Científicas Indexadas</a></li>
+                    <li><a href="#" class="hover:text-teal-400 transition">Código de Ética e Integridad</a></li>
+                    <li><a href="#" class="hover:text-teal-400 transition">Guía de Citación APA 7</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3 uppercase tracking-wider">Contacto</h4>
+                <p class="mb-2">Dirección de Comunicación Científica<br>Campus Central, Edificio I+D</p>
+                <p class="font-mono text-slate-300">contacto@gaceta-academica.edu</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 pt-6 border-t border-slate-800 text-center flex flex-col sm:flex-row justify-between items-center gap-2 text-[11px]">
+            <p>© 2026 Portal de Noticias Académico. Todos los derechos reservados.</p>
+            <p>Desarrollado para divulgación científica de alto impacto</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ACADEMIC DATA STORE
+        const newsArticles = [
+            {
+                id: 1,
+                featured: true,
+                title: "Avances Revolucionarios en Algoritmos de IA para la Predicción de Plegamiento Proteico",
+                category: "Tecnología e IA",
+                type: "Paper Research",
+                author: "Dra. Sofía Alarcón & Dr. Mateo Rossi",
+                authorRole: "Laboratorio de Bioinformática",
+                date: "2 Noviembre 2026",
+                readTime: "7 min de lectura",
+                abstract: "Un equipo multidisciplinario de la Facultad de Ciencias Exactas ha desarrollado un modelo neuronal híbrido que optimiza en un 40% la precisión en la simulación de estructuras moleculares complejas.",
+                content: `
+                    <p class="mb-4">El plegamiento de proteínas representa uno de los desafíos más complejos de la biología molecular moderna. Un grupo interdisciplinario de investigadores de nuestro Centro de Inteligencia Artificial y Bioinformática ha presentado hoy una arquitectura de aprendizaje profundo optimizada para predecir conformaciones tridimensionales complejas a partir de secuencias genómicas incompletas.</p>
+                    <p class="mb-4">El modelo, bautizado como <strong>BioFold-Alpha</strong>, integra transformadores de atención biológica con modelos mecánicos de mecánica cuántica acelerados por GPU. Según los resultados publicados en el volumen actual de la revista científica, la tasa de error RMSD descendió a cifras históricas de 0.8 Ångströms.</p>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-6 mb-2">Implicaciones Farmacológicas y Biotecnológicas</h3>
+                    <p class="mb-4">"La capacidad de diseñar enzimas sintéticas personalizadas en cuestión de horas en lugar de años acelerará drásticamente el desarrollo de tratamientos para enfermedades neurodegenerativas", afirmó la Dra. Sofía Alarcón durante la rueda de prensa realizada en el auditorio central.</p>
+                    <p class="mb-4">El proyecto ha contado con financiamiento conjunto del Consejo de Investigaciones y fondos internacionales de cooperación tecnológica.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80",
+                doi: "10.1038/s41586-026-0922-x",
+                citation: "Alarcón, S., & Rossi, M. (2026). Hybrid neural transformers for high-resolution protein folding. Journal of Computational Biology, 18(4), 201-218."
+            },
+            {
+                id: 2,
+                featured: false,
+                title: "Hallazgo de Restos Fósiles Inéditos en la Patagonia Revela Nuevas Claves Evolutivas",
+                category: "Investigación",
+                type: "Noticia",
+                author: "Dra. Valeria Gómez",
+                authorRole: "Depto. de Paleontología",
+                date: "31 Octubre 2026",
+                readTime: "4 min de lectura",
+                abstract: "Paleontólogos universitarios descubrieron un ejemplar de titanosaurio juvenil casi completo con preservación de tejido blando fosilizado.",
+                content: `
+                    <p class="mb-4">Una expedición científica en la formación geológica sureña dio como resultado el hallazgo extraordinario de un dinosaurio saurópodo juvenil en excelente estado de conservación. Este descubrimiento aporta evidencia crucial sobre el ritmo de crecimiento en los titanosaurios del Cretácico Superior.</p>
+                    <p class="mb-4">Los restos encontrados incluyen el cráneo parcial y vértebras cervicales articuladas, permitiendo reconstruir con precisión inédita su sistema respiratorio embrionario.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+                doi: "10.1016/j.palaeo.2026.10.012",
+                citation: "Gómez, V. et al. (2026). Exceptional preservation of a juvenile titanosaur in Southern Patagonia. Palaeogeography & Palaeoclimatology, 510, 109-122."
+            },
+            {
+                id: 3,
+                featured: false,
+                title: "Convocatoria Abierta: Becas Iberoamericanas de Movilidad Docente e Investigación 2027",
+                category: "Becas y Convocatorias",
+                type: "Convocatoria",
+                author: "Secretaría de Relaciones Internacionales",
+                authorRole: "Gestión Académica",
+                date: "28 Octubre 2026",
+                readTime: "3 min de lectura",
+                abstract: "Se abre el plazo de solicitud para 50 plazas de estancia académica subvencionadas en centros de excelencia en Europa y América Latina.",
+                content: `
+                    <p class="mb-4">La Secretaría de Relaciones Internacionales de la Universidad anuncia el inicio del periodo de postulaciones para el Programa Iberoamericano de Estancias Investigadoras 2027.</p>
+                    <p class="mb-4">Las becas cubren pasajes aéreos, seguro médico integral y un estipendio mensual de mantenimiento durante periodos de entre 3 y 6 meses. La fecha límite de recepción de proyectos finaliza el 30 de noviembre.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+                doi: "N/A - Convocatoria Institucional",
+                citation: "Universidad Central. (2026). Bases de la Convocatoria de Movilidad Docente 2027. Secretaría Internacional."
+            },
+            {
+                id: 4,
+                featured: false,
+                title: "Simposio Internacional sobre Sostenibilidad Urbana y Reducción de Huella de Carbono",
+                category: "Eventos",
+                type: "Evento",
+                author: "Comité de Ética Ambiental",
+                authorRole: "Red de Hábitat Sustentable",
+                date: "25 Octubre 2026",
+                readTime: "2 min de lectura",
+                abstract: "El encuentro reunirá a más de 300 expertos globales para discutir modelos urbanísticos resilientes frente al cambio climático.",
+                content: `
+                    <p class="mb-4">Durante los días 12 y 13 de noviembre se llevará a cabo en la Sede Central el III Simposio Internacional sobre Hábitat Sustentable. Se debatirán paneles sobre transporte de emisión cero, arquitectura bioclimática y gestión comunitaria del agua.</p>
+                    <p class="mb-4">Las inscripciones son gratuitas para estudiantes de grado y posgrado con acreditación previa.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
+                doi: "N/A - Acta de Evento",
+                citation: "Comité Organizador. (2026). Programa del III Simposio Internacional de Sostenibilidad Urbana."
+            },
+            {
+                id: 5,
+                featured: false,
+                title: "Inauguración del Nuevo Centro de Nanotecnología y Materiales Avanzados",
+                category: "Vida Universitaria",
+                type: "Noticia",
+                author: "Prensa Institucional",
+                authorRole: "Rectorado",
+                date: "20 Octubre 2026",
+                readTime: "5 min de lectura",
+                abstract: "Con un área de 2.000m² y salas limpias de clase ISO 5, el nuevo complejo posiciona a la universidad a la vanguardia regional.",
+                content: `
+                    <p class="mb-4">Con la presencia de autoridades nacionales e investigadoras principales, se inauguró el edificio de Nanotecnología. Las instalaciones cuentan con microscopios electrónicos de barrido de última generación y laboratorios de litografía de alta precisión.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
+                doi: "N/A - Comunicado",
+                citation: "Prensa Universitaria. (2026). Inauguración del Complejo Nanotecnológico. Noticiero Oficial."
+            },
+            {
+                id: 6,
+                featured: false,
+                title: "Estudio Revela los Efectos Positivos de la Pausa Activa en la Salud Mental Universitaria",
+                category: "Vida Universitaria",
+                type: "Paper Research",
+                author: "Lic. Camilo Serna & Dra. Ana Belén",
+                authorRole: "Facultad de Psicología",
+                date: "18 Octubre 2026",
+                readTime: "4 min de lectura",
+                abstract: "Intervenciones breves de mindfulness de 10 minutos al día demostraron reducir significativamente los índices de ansiedad académica durante exámenes.",
+                content: `
+                    <p class="mb-4">Un ensayo clínico controlado aleatorizado con más de 1.200 estudiantes universitarios arrojó reducciones del 28% en los niveles de cortisol salival tras incorporar micro-pausas guiadas en las rutinas de estudio diarias.</p>
+                `,
+                image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
+                doi: "10.1037/hea0001290",
+                citation: "Serna, C., & Belén, A. (2026). Micro-mindfulness interventions in higher education: A randomized trial. Health Psychology Review, 14(2), 88-102."
+            }
+        ];
+
+        const calendarEvents = [
+            {
+                day: "08",
+                month: "NOV",
+                title: "Defensa Tesis Doctoral: Criptografía Post-Cuántica",
+                speaker: "Mag. Lucas Peralta",
+                place: "Aula Magna - 10:00 hs"
+            },
+            {
+                day: "12",
+                month: "NOV",
+                title: "III Simposio de Hábitat Sustentable",
+                speaker: "Keynote: Dr. Hans Muller (MIT)",
+                place: "Auditorio de Ingeniería"
+            },
+            {
+                day: "20",
+                month: "NOV",
+                title: "Cierre Call for Papers: Revista Ciencia & Futuro",
+                speaker: "Edición Especial IA Biológica",
+                place: "Plataforma OJS"
+            }
+        ];
+
+        // STATE MANAGEMENT
+        let activeCategory = 'Todas';
+        let searchQuery = '';
+        let savedArticles = JSON.parse(localStorage.getItem('saved_academic_articles') || '[]');
+        let currentModalArticleId = null;
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            renderHero();
+            renderArticles();
+            renderCalendar();
+            setupThemeToggle();
+            setupSearch();
+            setupNewsletter();
+            updateSavedBadge();
+        });
+
+        // MOBILE MENU & RESPONSIVE TOGGLES
+        function toggleMobileMenu() {
+            const dropdown = document.getElementById('mobile-dropdown');
+            const icon = document.getElementById('menu-icon');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                icon.className = 'fa-solid fa-xmark text-lg';
+            } else {
+                dropdown.classList.add('hidden');
+                icon.className = 'fa-solid fa-bars text-lg';
+            }
+        }
+
+        function toggleCalendarWidget() {
+            const cal = document.getElementById('calendar-events');
+            const icon = document.getElementById('cal-toggle-icon');
+            if (cal.classList.contains('hidden')) {
+                cal.classList.remove('hidden');
+                icon.className = 'fa-solid fa-chevron-up';
+            } else {
+                cal.classList.add('hidden');
+                icon.className = 'fa-solid fa-chevron-down';
+            }
+        }
+
+        // LIVE CLOCK
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const str = now.toLocaleDateString('es-ES', options);
+            const formatted = `<i class="fa-regular fa-clock mr-1"></i> ${str.charAt(0).toUpperCase() + str.slice(1)}`;
+            
+            const desktopEl = document.getElementById('live-datetime');
+            const mobileEl = document.getElementById('live-datetime-mobile');
+            if (desktopEl) desktopEl.innerHTML = formatted;
+            if (mobileEl) mobileEl.innerHTML = formatted;
+        }
+
+        // RENDER HERO ARTICLE (RESPONSIVE HORIZONTAL/VERTICAL FLEX)
+        function renderHero() {
+            const hero = newsArticles.find(a => a.featured) || newsArticles[0];
+            const heroEl = document.getElementById('hero-section');
+            
+            heroEl.innerHTML = `
+                <div class="relative bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-800 text-white group cursor-pointer" onclick="openModal(${hero.id})">
+                    <div class="absolute inset-0 z-10 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent"></div>
+                    <img src="${hero.image}" alt="${hero.title}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700">
+                    
+                    <div class="relative z-20 p-5 sm:p-8 md:p-10 max-w-4xl space-y-3 sm:space-y-4">
+                        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <span class="bg-blue-600 text-white font-bold text-[10px] sm:text-[11px] uppercase tracking-wider px-2.5 py-0.5 sm:py-1 rounded-full">${hero.category}</span>
+                            <span class="bg-teal-500/90 backdrop-blur-sm text-slate-950 font-extrabold text-[10px] sm:text-[11px] uppercase tracking-wider px-2.5 py-0.5 sm:py-1 rounded-full">${hero.type}</span>
+                            <span class="text-[11px] sm:text-xs text-slate-300 font-medium ml-1 sm:ml-2"><i class="fa-regular fa-clock mr-1"></i> ${hero.readTime}</span>
+                        </div>
+
+                        <h2 class="text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight hover:text-teal-300 transition-colors">${hero.title}</h2>
+                        
+                        <p class="text-xs sm:text-sm text-slate-300 line-clamp-2 sm:line-clamp-3 font-normal max-w-3xl">${hero.abstract}</p>
+
+                        <div class="flex flex-wrap items-center justify-between pt-3 sm:pt-4 border-t border-slate-700/60 text-xs text-slate-300 gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-700 flex items-center justify-center font-bold text-white text-xs">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-white block text-xs">${hero.author}</span>
+                                    <span class="text-[10px] sm:text-[11px] text-slate-400">${hero.authorRole}</span>
+                                </div>
+                            </div>
+                            <span class="font-medium bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700 text-[11px]">${hero.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // UPDATE BOOKMARK BADGES IN ALL NAVBAR LOCATIONS
+        function updateSavedBadge() {
+            const countEl = document.getElementById('saved-count');
+            const countMobileEl = document.getElementById('saved-count-mobile');
+            const count = savedArticles.length;
+            
+            if (count > 0) {
+                if (countEl) { countEl.innerText = count; countEl.classList.remove('hidden'); }
+                if (countMobileEl) { countMobileEl.innerText = count; countMobileEl.classList.remove('hidden'); }
+            } else {
+                if (countEl) countEl.classList.add('hidden');
+                if (countMobileEl) countMobileEl.classList.add('hidden');
+            }
+        }
+
+        // SETUP THEME TOGGLE (SUPPORTING MOBILE AND DESKTOP CONTROLS)
+        function setupThemeToggle() {
+            const btn = document.getElementById('theme-toggle');
+            const btnMobile = document.getElementById('theme-toggle-mobile');
+
+            const applyTheme = (isDark) => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.theme = 'dark';
+                    updateThemeUI(true);
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                    updateThemeUI(false);
+                }
+            };
+
+            const updateThemeUI = (isDark) => {
+                const icon = document.getElementById('theme-icon');
+                const text = document.getElementById('theme-text');
+                const iconMobile = document.getElementById('theme-icon-mobile');
+                const textMobile = document.getElementById('theme-text-mobile');
+
+                if (isDark) {
+                    if (icon) icon.className = 'fa-solid fa-sun text-amber-400';
+                    if (text) text.innerText = 'Modo Claro';
+                    if (iconMobile) iconMobile.className = 'fa-solid fa-sun text-amber-400';
+                    if (textMobile) textMobile.innerText = 'Modo Claro';
+                } else {
+                    if (icon) icon.className = 'fa-solid fa-moon';
+                    if (text) text.innerText = 'Modo Oscuro';
+                    if (iconMobile) iconMobile.className = 'fa-solid fa-moon';
+                    if (textMobile) textMobile.innerText = 'Modo Oscuro';
+                }
+            };
+
+            const isInitialDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            applyTheme(isInitialDark);
+
+            const toggle = () => {
+                const currentDark = document.documentElement.classList.contains('dark');
+                applyTheme(!currentDark);
+            };
+
+            if (btn) btn.addEventListener('click', toggle);
+            if (btnMobile) btnMobile.addEventListener('click', toggle);
+        }
+
+        // RENDER HERO ARTICLE
+        function renderHero() {
+            const hero = newsArticles.find(a => a.featured) || newsArticles[0];
+            const heroEl = document.getElementById('hero-section');
+            
+            heroEl.innerHTML = `
+                <div class="relative bg-slate-900 rounded-3xl overflow-hidden shadow-xl border border-slate-800 text-white group cursor-pointer" onclick="openModal(${hero.id})">
+                    <div class="absolute inset-0 z-10 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent"></div>
+                    <img src="${hero.image}" alt="${hero.title}" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700">
+                    
+                    <div class="relative z-20 p-6 sm:p-10 max-w-4xl space-y-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider px-3 py-1 rounded-full">${hero.category}</span>
+                            <span class="bg-teal-500/90 backdrop-blur-sm text-slate-950 font-extrabold text-[11px] uppercase tracking-wider px-3 py-1 rounded-full">${hero.type}</span>
+                            <span class="text-xs text-slate-300 font-medium ml-2"><i class="fa-regular fa-clock mr-1"></i> ${hero.readTime}</span>
+                        </div>
+
+                        <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight hover:text-teal-300 transition-colors">${hero.title}</h2>
+                        
+                        <p class="text-sm sm:text-base text-slate-300 line-clamp-2 sm:line-clamp-3 font-normal max-w-3xl">${hero.abstract}</p>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-700/60 text-xs text-slate-300">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center font-bold text-white text-xs">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-white block">${hero.author}</span>
+                                    <span class="text-[11px] text-slate-400">${hero.authorRole}</span>
+                                </div>
+                            </div>
+                            <span class="font-medium bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">${hero.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // RENDER ARTICLES FEED
+        function renderArticles() {
+            const container = document.getElementById('articles-container');
+            const noResults = document.getElementById('no-results');
+            
+            let filtered = newsArticles.filter(art => {
+                const matchesCat = activeCategory === 'Todas' || art.category === activeCategory;
+                const matchesQuery = art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                     art.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                     art.author.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCat && matchesQuery;
+            });
+
+            document.getElementById('results-count').innerText = `Mostrando ${filtered.length} artículos`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            container.innerHTML = filtered.map(art => {
+                const isSaved = savedArticles.includes(art.id);
+                const badgeColor = getBadgeColor(art.type);
+
+                return `
+                    <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+                        <div>
+                            <!-- Card Image Header -->
+                            <div class="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-700">
+                                <img src="${art.image}" alt="${art.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-3 left-3 flex gap-1.5">
+                                    <span class="bg-slate-900/80 backdrop-blur-sm text-white font-semibold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md">${art.category}</span>
+                                    <span class="${badgeColor} font-bold text-[10px] uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">${art.type}</span>
+                                </div>
+                                <button onclick="toggleBookmark(event, ${art.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900 text-white backdrop-blur-sm flex items-center justify-center transition">
+                                    <i class="${isSaved ? 'fa-solid text-amber-400' : 'fa-regular'} fa-bookmark text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="p-5 space-y-3">
+                                <div class="flex items-center text-[11px] text-slate-500 dark:text-slate-400 gap-2">
+                                    <span><i class="fa-regular fa-calendar mr-1"></i>${art.date}</span>
+                                    <span>•</span>
+                                    <span><i class="fa-regular fa-clock mr-1"></i>${art.readTime}</span>
+                                </div>
+
+                                <h3 onclick="openModal(${art.id})" class="font-bold text-slate-900 dark:text-white text-base leading-snug hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer line-clamp-2">
+                                    ${art.title}
+                                </h3>
+
+                                <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                                    ${art.abstract}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-700/50 flex items-center justify-between text-xs">
+                            <span class="text-slate-600 dark:text-slate-400 font-medium truncate max-w-[160px]">
+                                <i class="fa-solid fa-feather text-slate-400 mr-1"></i> ${art.author}
+                            </span>
+                            <button onclick="openModal(${art.id})" class="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 text-[11px]">
+                                Leer Artículo <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // RENDER CALENDAR WIDGET
+        function renderCalendar() {
+            const calEl = document.getElementById('calendar-events');
+            calEl.innerHTML = calendarEvents.map(evt => `
+                <div class="flex gap-3 items-start p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                    <div class="bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300 rounded-lg p-2 text-center min-w-[48px] border border-blue-200 dark:border-blue-800">
+                        <span class="block text-sm font-extrabold leading-none">${evt.day}</span>
+                        <span class="block text-[9px] font-bold uppercase tracking-wider mt-0.5">${evt.month}</span>
+                    </div>
+                    <div class="space-y-0.5 text-xs">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200 leading-tight">${evt.title}</h4>
+                        <p class="text-slate-500 dark:text-slate-400 text-[11px]">${evt.speaker}</p>
+                        <span class="inline-block text-[10px] text-teal-600 dark:text-teal-400 font-medium">${evt.place}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // BADGE STYLING HELPER
+        function getBadgeColor(type) {
+            switch(type) {
+                case 'Paper Research': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+                case 'Convocatoria': return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
+                case 'Evento': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200';
+                default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            }
+        }
+
+        // CATEGORY FILTERING
+        function setCategory(cat) {
+            activeCategory = cat;
+            document.getElementById('section-title').innerText = cat === 'Todas' ? 'Noticias Recientes' : `Sección: ${cat}`;
+            
+            // Update Tab styles
+            document.querySelectorAll('#nav-tabs .nav-btn').forEach(btn => {
+                if (btn.innerText.trim() === cat) {
+                    btn.classList.add('bg-blue-900', 'text-white', 'dark:bg-blue-700');
+                    btn.classList.remove('hover:bg-slate-100', 'dark:hover:bg-slate-700');
+                } else {
+                    btn.classList.remove('bg-blue-900', 'text-white', 'dark:bg-blue-700');
+                }
+            });
+
+            renderArticles();
+        }
+
+        // SEARCH SETUP
+        function setupSearch() {
+            const input = document.getElementById('search-input');
+            input.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                renderArticles();
+            });
+        }
+
+        function resetFilters() {
+            activeCategory = 'Todas';
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            setCategory('Todas');
+        }
+
+        // MODAL READER SYSTEM
+        function openModal(id) {
+            const art = newsArticles.find(a => a.id === id);
+            if (!art) return;
+
+            currentModalArticleId = id;
+            document.getElementById('modal-category').innerText = art.category;
+            document.getElementById('modal-title').innerText = art.title;
+            document.getElementById('modal-author').innerHTML = `<i class="fa-solid fa-user-graduate text-blue-500"></i> ${art.author} <span class="text-slate-400 font-normal">(${art.authorRole})</span>`;
+            document.getElementById('modal-date').innerHTML = `<i class="fa-regular fa-calendar mr-1"></i> ${art.date}`;
+            document.getElementById('modal-read-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${art.readTime}`;
+            document.getElementById('modal-image').src = art.image;
+            document.getElementById('modal-body').innerHTML = art.content;
+            document.getElementById('modal-doi').innerText = `DOI: ${art.doi}`;
+            document.getElementById('modal-citation').innerText = art.citation;
+            document.getElementById('modal-type-badge').innerText = art.type;
+            document.getElementById('modal-type-badge').className = `px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${getBadgeColor(art.type)}`;
+
+            updateModalBookmarkIcon();
+
+            const modal = document.getElementById('reader-modal');
+            const container = document.getElementById('modal-container');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                container.classList.remove('scale-95');
+                container.classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('reader-modal');
+            const container = document.getElementById('modal-container');
+            
+            modal.classList.add('opacity-0');
+            container.classList.remove('scale-100');
+            container.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 200);
+        }
+
+        // BOOKMARK SYSTEM
+        function toggleBookmark(event, id) {
+            event.stopPropagation();
+            if (savedArticles.includes(id)) {
+                savedArticles = savedArticles.filter(item => item !== id);
+            } else {
+                savedArticles.push(id);
+            }
+            localStorage.setItem('saved_academic_articles', JSON.stringify(savedArticles));
+            updateSavedBadge();
+            renderArticles();
+        }
+
+        function toggleBookmarkCurrent() {
+            if (!currentModalArticleId) return;
+            if (savedArticles.includes(currentModalArticleId)) {
+                savedArticles = savedArticles.filter(item => item !== currentModalArticleId);
+            } else {
+                savedArticles.push(currentModalArticleId);
+            }
+            localStorage.setItem('saved_academic_articles', JSON.stringify(savedArticles));
+            updateSavedBadge();
+            updateModalBookmarkIcon();
+            renderArticles();
+        }
+
+        function updateModalBookmarkIcon() {
+            const icon = document.getElementById('modal-bookmark-icon');
+            if (savedArticles.includes(currentModalArticleId)) {
+                icon.className = 'fa-solid fa-bookmark text-amber-500 text-lg';
+            } else {
+                icon.className = 'fa-regular fa-bookmark text-lg';
+            }
+        }
+
+        function updateSavedBadge() {
+            const countEl = document.getElementById('saved-count');
+            if (savedArticles.length > 0) {
+                countEl.innerText = savedArticles.length;
+                countEl.classList.remove('hidden');
+            } else {
+                countEl.classList.add('hidden');
+            }
+        }
+
+        function toggleSavedArticles() {
+            const modal = document.getElementById('saved-modal');
+            const list = document.getElementById('saved-articles-list');
+
+            if (modal.classList.contains('hidden')) {
+                const savedItems = newsArticles.filter(a => savedArticles.includes(a.id));
+                if (savedItems.length === 0) {
+                    list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes artículos guardados aún.</p>`;
+                } else {
+                    list.innerHTML = savedItems.map(item => `
+                        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-between border border-slate-200 dark:border-slate-700">
+                            <div class="pr-2">
+                                <span class="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase">${item.category}</span>
+                                <h4 onclick="toggleSavedArticles(); openModal(${item.id})" class="text-xs font-bold text-slate-800 dark:text-white hover:underline cursor-pointer line-clamp-1">${item.title}</h4>
+                            </div>
+                            <button onclick="toggleBookmark(event, ${item.id}); toggleSavedArticles(); toggleSavedArticles();" class="text-slate-400 hover:text-red-500 text-xs">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // DARK / LIGHT THEME TOGGLE
+        function setupThemeToggle() {
+            const btn = document.getElementById('theme-toggle');
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+
+            // Detect system preference or saved preference
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+                text.innerText = 'Modo Claro';
+            } else {
+                document.documentElement.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon';
+                text.innerText = 'Modo Oscuro';
+            }
+
+            btn.addEventListener('click', () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                    icon.className = 'fa-solid fa-moon';
+                    text.innerText = 'Modo Oscuro';
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.theme = 'dark';
+                    icon.className = 'fa-solid fa-sun text-amber-400';
+                    text.innerText = 'Modo Claro';
+                }
+            });
+        }
+
+        // NEWSLETTER SUBMISSION MOCK
+        function setupNewsletter() {
+            const form = document.getElementById('newsletter-form');
+            const msg = document.getElementById('newsletter-msg');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                form.reset();
+                msg.classList.remove('hidden');
+                setTimeout(() => {
+                    msg.classList.add('hidden');
+                }, 4000);
+            });
+        }
+
+        // DOWNLOAD PDF MOCK
+        function downloadPDFMock() {
+            alert("Descargando versión en PDF del artículo científico (Preprint Oficial)...");
+        }
+    </script>
+</body>
+</html>
